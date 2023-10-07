@@ -1,0 +1,53 @@
+CloudLight lED;
+CloudRelativeHumidity humidity;
+CloudTemperature temperature;
+
+#include<DHT.h>
+#include "thingProperties.h"
+
+DHT sensor(27, DHT11);
+
+void setup()
+ {
+  sensor.begin();
+  Serial.begin(9600);
+  pinMode(2, OUTPUT);
+  delay(1500);
+
+initProperties();
+ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+setDebugMessageLevel(2);
+ArduinoCloud.printDebugInfo();
+ }
+
+void loop() {
+  ArduinoCloud.update();
+  float temp = sensor.readTemperature();
+  float hum = sensor.readHumidity();
+  temperature = temp;
+  humidity = hum;
+
+  Serial.print("Temperature :");
+  Serial.print(temp);
+  Serial.print("'C ");
+  if (temp > 30.0) {
+    Serial.print("Turn on the AC because your room might be hot!");
+  }
+Serial.print("\n");
+  Serial.print("Humidity : ");
+  Serial.print(hum);
+  Serial.print("% ");
+  Serial.print("\n");
+  if (hum < 40.0) {
+    Serial.print("Low Humidity!");
+  }
+  delay(2000);
+}
+void onLEDChange()  {
+  if (lED == 1) {
+    digitalWrite(2, HIGH);
+  }
+  else {
+    digitalWrite(2, LOW);
+  }
+}
